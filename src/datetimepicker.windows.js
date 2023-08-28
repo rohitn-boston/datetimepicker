@@ -36,7 +36,7 @@ const RNTimePickerWindows = requireNativeComponent('RNTimePickerWindows');
 export default function RNDateTimePickerQWE(
   props: WindowsNativeProps,
 ): React.Node {
-  sharedPropsValidation({value: props?.value});
+  // sharedPropsValidation({value: props?.value});
 
   const localProps = {
     dayOfWeekFormat: props.dayOfWeekFormat,
@@ -78,7 +78,7 @@ export default function RNDateTimePickerQWE(
       <RNDateTimePickerWindows
         {...localProps}
         onChange={_onChange}
-        timeZoneOffsetInSeconds={timezoneOffsetInSeconds}
+        // timeZoneOffsetInSeconds={timezoneOffsetInSeconds}
       />
     );
   } else if (mode === WINDOWS_MODE.time) {

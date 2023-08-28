@@ -27,7 +27,7 @@ type BaseOptions = {
   /**
    * The currently selected date.
    */
-  value: Date;
+  value: Date | null;
 
   /**
    * Date change handler.
@@ -36,6 +36,7 @@ type BaseOptions = {
    * The first argument is an Event, the second a selected Date.
    */
   onChange?: (event: DateTimePickerEvent, date?: Date) => void;
+
 };
 
 type DateOptions = BaseOptions & {
@@ -190,6 +191,7 @@ export type WindowsNativeProps = Readonly<
 
       placeholderText?: string;
       dateFormat?:
+        | '{month.integer(2)}/{day.integer(2)}/{year.full}'
         | 'day month year'
         | 'dayofweek day month'
         | 'longdate'

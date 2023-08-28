@@ -15,7 +15,7 @@ namespace winrt {
 }
 
 namespace winrt::DateTimePicker::implementation {
-
+int64_t timeInMilliseconds = 0;
     DateTimePickerView::DateTimePickerView(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
         RegisterEvents();
     }
@@ -95,7 +95,7 @@ namespace winrt::DateTimePicker::implementation {
             }
             else if (propertyName == "selectedDate") {
                 if (propertyValue.IsNull()) {
-                    this->ClearValue(xaml::Controls::CalendarDatePicker::DateProperty());
+                    this->ClearValue(xaml::Controls::CalendarDatePicker::PlaceholderTextProperty());
                 }
                 else {
                     m_selectedTime = propertyValue.AsInt64();
@@ -125,22 +125,36 @@ namespace winrt::DateTimePicker::implementation {
         m_updating = false;
     }
 
-    void DateTimePickerView::OnDateChanged(winrt::IInspectable const& /*sender*/, xaml::Controls::CalendarDatePickerDateChangedEventArgs const& args){
-        if (!m_updating && args.NewDate() != nullptr) {
-            auto timeInMilliseconds = DateTimeToMiliseconds(args.NewDate().Value(), m_timeZoneOffsetInSeconds);
+    void DateTimePickerView::OnDateChanged(winrt::IInspectable const& /*sender*/, xaml::Controls::CalendarDatePickerDateChangedEventArgs const& args) {
+   
+    if (!m_updating && args.NewDate() != nullptr) {
+         
+        timeInMilliseconds = DateTimeToMiliseconds(args.NewDate().Value(), m_timeZoneOffsetInSeconds);
 
-            m_reactContext.DispatchEvent(
-                *this,
-                L"topChange",
-                [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
+        m_reactContext.DispatchEvent(
+            *this,
+            L"topChange",
+            [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
                 {
                     WriteProperty(eventDataWriter, L"newDate", timeInMilliseconds);
                 }
                 eventDataWriter.WriteObjectEnd();
             });
-        }
-    }
+    } else if(!m_updating && args.NewDate() == nullptr) {
+        m_reactContext.DispatchEvent(
+            *this,
+            L"topChange",
+            [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                {
+                    WriteProperty(eventDataWriter, L"newDate", timeInMilliseconds);
+                    WriteProperty(eventDataWriter, L"error", L"Deselecting date.");
+                }
+                eventDataWriter.WriteObjectEnd();
+            });
+    } 
+}
 
     winrt::DateTime DateTimePickerView::DateTimeFrom(int64_t timeInMilliSeconds, int64_t timeZoneOffsetInSeconds) {
         const auto timeInSeconds = timeInMilliSeconds / 1000;
